@@ -1,11 +1,13 @@
 import mongoose, {Schema, Document} from "mongoose";
 
 export interface Message extends Document {
+  id?: mongoose.Types.ObjectId;
   content: string;
   createdAt: Date;
 }
 
 export interface User extends Document {
+  id?: mongoose.Types.ObjectId;
   username: string;
   email: string;
   password: string;
