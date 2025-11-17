@@ -15,7 +15,10 @@ interface EmailTemplateProps {
   otp: string;
 }
 
-export function EmailTemplate({username,otp}: EmailTemplateProps) {
+export function EmailTemplate({
+  username,
+  otp: verificationCode,
+}: EmailTemplateProps) {
   return (
     <>
       <Html lang="en" dir="ltr">
@@ -32,7 +35,9 @@ export function EmailTemplate({username,otp}: EmailTemplateProps) {
             fontStyle="normal"
           />
         </Head>
-        <Preview>Here&apos;s your verification code: {otp}</Preview>
+        <Preview>
+          Here&apos;s your verification code: {verificationCode}
+        </Preview>
         <Section>
           <Row>
             <Heading as="h2">Hello {username},</Heading>
@@ -44,7 +49,7 @@ export function EmailTemplate({username,otp}: EmailTemplateProps) {
             </Text>
           </Row>
           <Row>
-            <Text>{otp}</Text>
+            <Text>{verificationCode}</Text>
           </Row>
           <Row>
             <Text>
