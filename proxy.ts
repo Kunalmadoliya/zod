@@ -11,14 +11,18 @@ export default withAuth(
         const {pathname} = req.nextUrl;
 
         if (
-          pathname.startsWith("/api/auth") ||
-          pathname === "/login" ||
-          pathname === "/register"
-        )
-          return true;
-        if (pathname === "/" || pathname.startsWith("/api/videos") || pathname === "/upload" ) return true;
+          token &&
+          (pathname.startsWith("/login") || pathname.startsWith("/register"))
+        ) {
+          return false;
+        }
 
-        return !!token;
+        if (!token && pathname.startsWith("/dashboard")) {
+          return false;
+        }
+
+        // ✅ Allow everything else
+        return true;
       },
     },
   }
