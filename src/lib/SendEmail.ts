@@ -3,6 +3,8 @@ import {Resend} from "resend";
 import {EmailTemplate} from "../../emails/EmailTemplate";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+console.log("API KEY:", process.env.RESEND_API_KEY);
+
 
 export default async function SendEmail(
   email: string,
@@ -11,7 +13,7 @@ export default async function SendEmail(
 ) {
   try {
     const {data, error} = await resend.emails.send({
-      from: "madoliyakunal2005@gmail.com",
+      from: "onboarding@resend.dev",
       to: email,
       subject: "Verification Code",
       react: EmailTemplate({username, otp: verificationCode}),

@@ -13,7 +13,7 @@ const RegisterPage = () => {
   const {register, handleSubmit} = useForm<FormValues>();
   const router = useRouter();
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    const res = await fetch("/register", {
+    const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
@@ -22,17 +22,15 @@ const RegisterPage = () => {
         password: data.password,
       }),
     });
-    console.log("BODY:", {
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    });
+    const newData = await res.json();
+
+    console.log(newData);
+    
 
     if (!res.ok) {
       console.log("Error");
     } else {
-     console.log("hello");
-     
+     router.push('/email-verification')
     }
   };
   const onError: SubmitErrorHandler<FormValues> = (errors) =>
