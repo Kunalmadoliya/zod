@@ -3,7 +3,7 @@ import SendEmail from "@/lib/SendEmail";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 
-export async function register(req: Request) {
+export async function POST(req: Request) {
   await dbConnect();
   try {
     const {username, email, password} = await req.json();
