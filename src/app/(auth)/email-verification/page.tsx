@@ -30,9 +30,7 @@ const FormSchema = z.object({
 export default function VerifyOtpPage() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: {
-      pin: "",
-    },
+    defaultValues: { pin: "" },
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
@@ -46,16 +44,19 @@ export default function VerifyOtpPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 ">
-      <div className="w-full sm:w-150 border border-gray-300 px-8 py-10 rounded-3xl shadow-sm ">
-        <h2 className="text-5xl sm:text-7xl font-semibold text-gray-900">
+    <div className="min-h-screen flex items-center justify-center px-4 py-6 bg-white">
+      <div className="w-full max-w-md border border-gray-300 px-6 py-8 rounded-2xl shadow-sm">
+        
+        {/* Heading */}
+        <h2 className="text-4xl sm:text-6xl font-semibold text-gray-900 text-center">
           Verify OTP
         </h2>
 
-        <p className="text-sm text-gray-600 mt-2 px-1">
+        <p className="text-sm text-gray-600 mt-2 text-center">
           Enter the 6-digit code sent to your email
         </p>
 
+        {/* Form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -65,8 +66,11 @@ export default function VerifyOtpPage() {
               control={form.control}
               name="pin"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="mb-1">One-Time Password</FormLabel>
+                <FormItem className="w-full flex flex-col items-center">
+                  <FormLabel className="mb-1 text-sm">
+                    One-Time Password
+                  </FormLabel>
+
                   <FormControl>
                     <InputOTP maxLength={6} {...field}>
                       <InputOTPGroup>
@@ -79,9 +83,11 @@ export default function VerifyOtpPage() {
                       </InputOTPGroup>
                     </InputOTP>
                   </FormControl>
+
                   <FormDescription className="mt-1">
                     Please enter the OTP sent to your email.
                   </FormDescription>
+
                   <FormMessage />
                 </FormItem>
               )}
