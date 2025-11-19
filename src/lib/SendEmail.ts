@@ -11,7 +11,7 @@ export default async function SendEmail(
 ) {
   try {
     const {data, error} = await resend.emails.send({
-      from: "Acme <onboarding@resend.dev>",
+      from: "madoliyakunal2005@gmail.com",
       to: email,
       subject: "Verification Code",
       react: EmailTemplate({username, otp: verificationCode}),

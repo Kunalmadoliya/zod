@@ -5,78 +5,67 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req: Request) {
   await dbConnect();
+
   try {
     const {username, email, password} = await req.json();
 
-    const verifiedUserByUsername = await User.findOne({
-      username,
-      isVerified: true,
-    });
-
-    const verifiedUserByEmail = await User.findOne({email});
-
-    if (verifiedUserByUsername) {
+    // Validate
+    if (!username || !email || !password) {
       return Response.json(
-        {
-          success: false,
-          message: "Username is already taken",
-        },
+        {success: false, message: "All fields are required"},
         {status: 400}
       );
     }
 
-    if (verifiedUserByEmail && verifiedUserByEmail.isVerified === true) {
+    // Check username conflict (only if verified)
+    const existingUsername = await User.findOne({username, isVerified: true});
+    if (existingUsername) {
       return Response.json(
-        {
-          success: false,
-          message: "Email is already taken",
-        },
+        {success: false, message: "Username is already taken"},
         {status: 400}
       );
     }
-    
+
+    // Check email
+    const existingEmail = await User.findOne({email});
+
+    // Hash password once
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate OTP
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000
     ).toString();
+    const expiryDate = new Date(Date.now() + 3600000); // 1 hour
 
-    if (verifiedUserByEmail && !verifiedUserByEmail.isVerified) {
-      verifiedUserByEmail!.password = hashedPassword;
-      verifiedUserByEmail!.verificationCode = verificationCode;
-
-      verifiedUserByEmail.verificationCodeExpire = new Date(
-        Date.now() + 3600000
-      );
-
-      await verifiedUserByEmail.save();
+    // CASE 1 — Email exists but user is NOT verified → update user
+    if (existingEmail && !existingEmail.isVerified) {
+      existingEmail.username = username;
+      existingEmail.password = hashedPassword;
+      existingEmail.verificationCode = verificationCode;
+      existingEmail.verificationCodeExpire = expiryDate;
+      await existingEmail.save();
     }
 
-    if (!verifiedUserByEmail) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + 1);
-
-      const newUser = await User.create({
+    // CASE 2 — Fresh new user
+    if (!existingEmail) {
+      await User.create({
         username,
         email,
         password: hashedPassword,
-        verificationCode: verificationCode,
+        verificationCode,
         verificationCodeExpire: expiryDate,
-        isVerified: true,
+        isVerified: false,
         isAcceptingMessage: true,
         messages: [],
       });
-
-      await newUser.save();
     }
 
-    const sendUserEmail = await SendEmail(email, username, verificationCode);
-    if (!sendUserEmail.success) {
+    // Send verification email
+    const sendEmailRes = await SendEmail(email, username, verificationCode);
+    if (!sendEmailRes.success) {
       return Response.json(
-        {
-          success: false,
-          message: sendUserEmail.message,
-        },
+        {success: false, message: sendEmailRes.message},
         {status: 500}
       );
     }
@@ -84,17 +73,14 @@ export async function POST(req: Request) {
     return Response.json(
       {
         success: true,
-        message: "User registered successfully. Please verify your account.",
+        message: "OTP sent. Please verify your email.",
       },
       {status: 201}
     );
-  } catch (error) {
-    console.error("Error registering user:", error);
+  } catch (err) {
+    console.error("Register error:", err);
     return Response.json(
-      {
-        success: false,
-        message: "Error registering user",
-      },
+      {success: false, message: "Server error"},
       {status: 500}
     );
   }

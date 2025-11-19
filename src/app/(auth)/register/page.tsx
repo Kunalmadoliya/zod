@@ -1,5 +1,6 @@
 "use client";
 
+import {useRouter} from "next/navigation";
 import {useForm, SubmitHandler, SubmitErrorHandler} from "react-hook-form";
 
 type FormValues = {
@@ -10,8 +11,9 @@ type FormValues = {
 
 const RegisterPage = () => {
   const {register, handleSubmit} = useForm<FormValues>();
+  const router = useRouter();
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    const res = await fetch("/api/auth/register", {
+    const res = await fetch("/register", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({
@@ -20,11 +22,17 @@ const RegisterPage = () => {
         password: data.password,
       }),
     });
+    console.log("BODY:", {
+      username: data.username,
+      email: data.email,
+      password: data.password,
+    });
 
     if (!res.ok) {
       console.log("Error");
     } else {
-      console.log("Success");
+     console.log("hello");
+     
     }
   };
   const onError: SubmitErrorHandler<FormValues> = (errors) =>
@@ -78,6 +86,7 @@ const RegisterPage = () => {
                 </label>
                 <input
                   type="password"
+                  {...register("password")}
                   className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-black/70 focus:border-black outline-none "
                   placeholder="Enter your password"
                 />
