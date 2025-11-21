@@ -1,12 +1,15 @@
-import { Suspense } from "react";
-import type { ReactNode } from "react";
+"use client";
 
-export default function Layout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+import { Suspense } from "react";
+import VerifyOtpPage from "./page";
+
+
+export const dynamic = "force-dynamic"; // <-- REQUIRED
+
+export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyOtpPage />
+    </Suspense>
   );
 }
