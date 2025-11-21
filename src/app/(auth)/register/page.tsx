@@ -21,9 +21,8 @@ const RegisterPage = () => {
         body: JSON.stringify(data),
       });
 
-      console.log("Status:", res.status);
-      const text = await res.text();
-      console.log("Response:", text);
+    
+
 
       if (res.ok) {
         router.push(`/email-verification?username=${data.username}`);
