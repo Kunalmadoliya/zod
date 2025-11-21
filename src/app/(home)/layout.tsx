@@ -1,13 +1,12 @@
-import Navbar from '@/components/Navbar';
-
+import { Navbar } from "@/components/ui/resizable-navbar";
 interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-export default async function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({children}: RootLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      {/* <Navbar/> */}
       {children}
     </div>
   );

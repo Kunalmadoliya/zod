@@ -20,7 +20,7 @@ const LoginPage = () => {
     });
 
     if (req?.error) console.error(req.error);
-    else router.push("/");
+    else router.push("/dashboard");
   };
 
   const onError: SubmitErrorHandler<FormValues> = (errors) =>
