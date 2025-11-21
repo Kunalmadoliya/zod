@@ -14,11 +14,13 @@ export default async function SendEmail(
   try {
     const {data, error} = await resend.emails.send({
       from: "onboarding@resend.dev",
-      to: email,
+      to: "madoliyakunal2005@gmail.com",
       subject: "Verification Code",
       react: EmailTemplate({username, otp: verificationCode}),
     });
 
+    console.log(email, username );
+    
     if (error) {
       return {
         success: false,

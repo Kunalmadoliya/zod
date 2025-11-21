@@ -1,11 +1,12 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { toast } from "sonner"
-import { z } from "zod"
+import { useRouter, useSearchParams } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,39 +15,70 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
+
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from "@/components/ui/input-otp";
 
+// -------------------- SCHEMA --------------------
 const FormSchema = z.object({
-  pin: z.string().min(6, {
+  code: z.string().min(6, {
     message: "Your one-time password must be 6 characters.",
   }),
-})
+});
 
+// -------------------- COMPONENT --------------------
 export default function VerifyOtpPage() {
+  const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const username = searchParams.get("username");  // <-- this was missing
+
+  console.log(username);
+  
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { pin: "" },
-  })
+    defaultValues: { code: "" },
+  });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+  // -------------------- SUBMIT HANDLER --------------------
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    toast("Submitting OTP...", {
+      description: JSON.stringify(data, null, 2),
+    });
+
+
+    console.log(data);
+    
+    const res = await fetch("/api/verify-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username,
+        code :data.code
+      }),
+    });
+
+    console.log(res);
+    
+    console.log("Status:", res.status);
+    console.log("Response:", await res.text());
+
+    if (res.ok) {
+      router.push("/login");
+    } else {
+      console.log("Error verifying OTP");
+    }
   }
 
+  // -------------------- UI --------------------
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-6 bg-white">
       <div className="w-full max-w-md border border-gray-300 px-6 py-8 rounded-2xl shadow-sm">
-        
+
         {/* Heading */}
         <h2 className="text-4xl sm:text-6xl font-semibold text-gray-900 text-center">
           Verify OTP
@@ -64,7 +96,7 @@ export default function VerifyOtpPage() {
           >
             <FormField
               control={form.control}
-              name="pin"
+              name="code"
               render={({ field }) => (
                 <FormItem className="w-full flex flex-col items-center">
                   <FormLabel className="mb-1 text-sm">
@@ -100,5 +132,5 @@ export default function VerifyOtpPage() {
         </Form>
       </div>
     </div>
-  )
+  );
 }

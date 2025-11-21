@@ -9,6 +9,8 @@ export async function POST(req: Request) {
   try {
     const {username, email, password} = await req.json();
 
+    console.log(username,email,password);
+    
     // Validate
     if (!username || !email || !password) {
       return Response.json(
@@ -63,6 +65,8 @@ export async function POST(req: Request) {
 
     // Send verification email
     const sendEmailRes = await SendEmail(email, username, verificationCode);
+    console.log(sendEmailRes);
+    
     if (!sendEmailRes.success) {
       return Response.json(
         {success: false, message: sendEmailRes.message},

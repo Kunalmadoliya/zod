@@ -1,7 +1,7 @@
 "use client";
 
-import {useRouter} from "next/navigation";
-import {useForm, SubmitHandler, SubmitErrorHandler} from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useForm, SubmitHandler, SubmitErrorHandler } from "react-hook-form";
 
 type FormValues = {
   username: string;
@@ -10,26 +10,39 @@ type FormValues = {
 };
 
 const RegisterPage = () => {
-  const {register, handleSubmit} = useForm<FormValues>();
+  const { register, handleSubmit } = useForm<FormValues>();
   const router = useRouter();
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify(data),
-    });
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    if (res.ok) router.push("/email-verification");
-    else console.log("Error");
+      console.log("Status:", res.status);
+      const text = await res.text();
+      console.log("Response:", text);
+
+      if (res.ok) {
+        router.push(`/email-verification?username=${data.username}`);
+      } else {
+        console.log("Registration failed");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
-  const onError: SubmitErrorHandler<FormValues> = (errors) =>
+  const onError: SubmitErrorHandler<FormValues> = (errors) => {
     console.log(errors);
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-6 bg-white">
       <div className="w-full max-w-md border border-gray-300 px-6 py-8 shadow-sm rounded-2xl">
+
         {/* Heading */}
         <div className="text-center mb-6">
           <h2 className="text-4xl sm:text-6xl font-semibold text-gray-900">
@@ -38,11 +51,12 @@ const RegisterPage = () => {
           <p className="text-sm text-gray-600 mt-1">Register your account</p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-5">
+
+          {/* Username */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Username
-            </label>
+            <label className="text-sm font-medium text-gray-700">Username</label>
             <input
               type="text"
               {...register("username")}
@@ -51,6 +65,7 @@ const RegisterPage = () => {
             />
           </div>
 
+          {/* Email */}
           <div className="flex flex-col gap-1">
             <label className="text-sm font-medium text-gray-700">Email</label>
             <input
@@ -61,10 +76,9 @@ const RegisterPage = () => {
             />
           </div>
 
+          {/* Password */}
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Password
-            </label>
+            <label className="text-sm font-medium text-gray-700">Password</label>
             <input
               type="password"
               {...register("password")}
@@ -73,12 +87,14 @@ const RegisterPage = () => {
             />
           </div>
 
+          {/* Submit Button */}
           <button
             type="submit"
             className="w-full bg-black text-white py-2 rounded-lg text-sm font-medium hover:bg-black/90 transition"
           >
             Register
           </button>
+
         </form>
       </div>
     </div>
